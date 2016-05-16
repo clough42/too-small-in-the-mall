@@ -1,13 +1,27 @@
 namespace TooSmall
 {
     using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Runtime.Serialization;
+    using System.Runtime.Serialization.Json;
 
+    [DataContract]
     public class Room
     {
-        public string Description;
-        public int E;
-        public int N;
+        [DataMember(Order = 1)]
         public string Name;
+        [DataMember(Order = 2)]
+        public string Description;
+        [DataMember(Order = 3)]
+        public int N;
+        [DataMember(Order = 4)]
+        public int S;
+        [DataMember(Order = 5)]
+        public int E;
+        [DataMember(Order = 6)]
+        public int W;
+
         public static Room[] rooms = new Room[] { 
             new Room("", "", 0, 0, 0, 0), 
             new Room("Furniture Store", "  You are in the north end of the furniture store.   Judging from the type of furniture here, you seem to be in the office accessories department.  You have reached the end of the store now and the only exit is to the south. ", 0, 2, 0, 0), 
@@ -58,8 +72,8 @@ namespace TooSmall
             new Room("On Rex's Bookcase", "  You are on top of a tall bookcase.  There is a speaker cord on the wall.", 0, 0, 0x2f, 0), 
             new Room("In Your Cage", "  You are in a cage on top of a tall bookcase.", 0, 0, 0, 0x2e)
         };
-        public int S;
-        public int W;
+
+
 
         public Room(string name, string description, int n, int s, int e, int w)
         {
@@ -69,6 +83,15 @@ namespace TooSmall
             this.S = s;
             this.E = e;
             this.W = w;
+        }
+
+        public static void Dump()
+        {
+            using (Stream stream = File.OpenWrite("gen_rooms.json"))
+            {
+                DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(List<Room>));
+                ser.WriteObject(stream, new List<Room>(rooms));
+            }
         }
     }
 }

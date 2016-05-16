@@ -1,11 +1,14 @@
 namespace TooSmall
 {
     using System;
-
+    using System.Runtime.Serialization;
     [Serializable]
+    [DataContract]
     public class Item
     {
+        [DataMember(Order = 4)]
         public int Carry;
+        [DataMember(Order = 3)]
         public int Condition;
         public static Item[] items = new Item[] { 
             new Item("", 0, 0, 0),
@@ -53,7 +56,9 @@ namespace TooSmall
             new Item("door to outside", 0x20, 0, 1), 
             new Item("door to outside", 0x24, 0, 1)
         };
+        [DataMember(Order = 1)]
         public string Name;
+        [DataMember(Order = 2)]
         public int Room;
 
         public Item()

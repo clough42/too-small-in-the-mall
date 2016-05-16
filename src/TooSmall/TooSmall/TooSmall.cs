@@ -17,25 +17,14 @@ namespace TooSmall
             this.ui = ui;
             this.random = new Random();
             this.game = new GameData();
-            this.game.CurrentRoom = 0x2f;
-            this.game.Strength = false;
-            this.game.Inventory = 0;
-            this.game.Dead = false;
-            this.game.Out = false;
-            this.game.Quit = false;
-            this.game.ObjectArray = new Item[Item.items.Length];
-            for (int i = 0; i < Item.items.Length; i++)
-            {
-                this.game.ObjectArray[i] = new Item(Item.items[i]);
-            }
             this.init();
         }
 
         private void Animate()
         {
-            for (int i = 1; i < this.game.ObjectArray.Length; i++)
+            for (int i = 1; i < this.game.Items.Length; i++)
             {
-                if ((this.game.ObjectArray[i].Carry == 3) && (this.game.ObjectArray[i].Room == this.game.CurrentRoom))
+                if ((this.game.Items[i].Carry == 3) && (this.game.Items[i].Room == this.game.CurrentRoom))
                 {
                     switch (i)
                     {
@@ -107,9 +96,9 @@ namespace TooSmall
         {
             bool flag = true;
             this.Writeln("You have in your posession:");
-            for (int i = 1; i < this.game.ObjectArray.Length; i++)
+            for (int i = 1; i < this.game.Items.Length; i++)
             {
-                Item item = this.game.ObjectArray[i];
+                Item item = this.game.Items[i];
                 if (item.Room == 0)
                 {
                     this.Writeln("     " + item.Name);
@@ -126,9 +115,9 @@ namespace TooSmall
         private void DisplayObjects()
         {
             bool flag = true;
-            for (int i = 1; i < this.game.ObjectArray.Length; i++)
+            for (int i = 1; i < this.game.Items.Length; i++)
             {
-                Item item = this.game.ObjectArray[i];
+                Item item = this.game.Items[i];
                 if (item.Room == this.game.CurrentRoom)
                 {
                     if (flag)
@@ -152,14 +141,14 @@ namespace TooSmall
                 this.Errorout(1, "");
                 return false;
             }
-            if (this.game.ObjectArray[NounToken].Room != 0)
+            if (this.game.Items[NounToken].Room != 0)
             {
                 this.Errorout(5, "");
                 return false;
             }
-            this.game.ObjectArray[NounToken].Room = this.game.CurrentRoom;
+            this.game.Items[NounToken].Room = this.game.CurrentRoom;
             this.game.Inventory--;
-            this.Writeln(this.game.ObjectArray[NounToken].Name + " dropped.");
+            this.Writeln(this.game.Items[NounToken].Name + " dropped.");
             return true;
         }
 
@@ -173,7 +162,7 @@ namespace TooSmall
                 flag = true;
                 flag2 = false;
             }
-            if ((this.game.ObjectArray[NounToken].Room != 0) && !flag)
+            if ((this.game.Items[NounToken].Room != 0) && !flag)
             {
                 this.Errorout(5, "");
                 flag = true;
@@ -184,7 +173,7 @@ namespace TooSmall
                 {
                     this.Writeln("Eaten.");
                     this.game.Inventory--;
-                    this.game.ObjectArray[NounToken].Room = 0xff;
+                    this.game.Items[NounToken].Room = 0xff;
                     switch (NounToken)
                     {
                         case 0x18:
@@ -422,22 +411,22 @@ namespace TooSmall
                 this.Errorout(1, "");
                 return false;
             }
-            if (this.game.ObjectArray[NounToken].Room != this.game.CurrentRoom)
+            if (this.game.Items[NounToken].Room != this.game.CurrentRoom)
             {
                 this.Errorout(3, "");
                 return flag;
             }
-            if (this.game.ObjectArray[NounToken].Condition != 2)
+            if (this.game.Items[NounToken].Condition != 2)
             {
                 this.Writeln("It's not broken.");
                 return flag;
             }
-            if (this.game.ObjectArray[0x13].Room != 0)
+            if (this.game.Items[0x13].Room != 0)
             {
                 this.Writeln("You don't have the proper tools.");
                 return flag;
             }
-            this.game.ObjectArray[NounToken].Condition -= 2;
+            this.game.Items[NounToken].Condition -= 2;
             this.Writeln("Fixed.");
             return flag;
         }
@@ -449,37 +438,37 @@ namespace TooSmall
             {
                 case 0x12:
                 case 0x16:
-                    flag = Room.rooms[this.game.CurrentRoom].N == 0;
+                    flag = game.Rooms[this.game.CurrentRoom].N == 0;
                     if (!flag)
                     {
-                        this.game.CurrentRoom = Room.rooms[this.game.CurrentRoom].N;
+                        this.game.CurrentRoom = game.Rooms[this.game.CurrentRoom].N;
                     }
                     break;
 
                 case 0x13:
                 case 0x17:
-                    flag = Room.rooms[this.game.CurrentRoom].S == 0;
+                    flag = game.Rooms[this.game.CurrentRoom].S == 0;
                     if (!flag)
                     {
-                        this.game.CurrentRoom = Room.rooms[this.game.CurrentRoom].S;
+                        this.game.CurrentRoom = game.Rooms[this.game.CurrentRoom].S;
                     }
                     break;
 
                 case 20:
                 case 0x18:
-                    flag = Room.rooms[this.game.CurrentRoom].E == 0;
+                    flag = game.Rooms[this.game.CurrentRoom].E == 0;
                     if (!flag)
                     {
-                        this.game.CurrentRoom = Room.rooms[this.game.CurrentRoom].E;
+                        this.game.CurrentRoom = game.Rooms[this.game.CurrentRoom].E;
                     }
                     break;
 
                 case 0x15:
                 case 0x19:
-                    flag = Room.rooms[this.game.CurrentRoom].W == 0;
+                    flag = game.Rooms[this.game.CurrentRoom].W == 0;
                     if (!flag)
                     {
-                        this.game.CurrentRoom = Room.rooms[this.game.CurrentRoom].W;
+                        this.game.CurrentRoom = game.Rooms[this.game.CurrentRoom].W;
                     }
                     break;
 
@@ -497,7 +486,7 @@ namespace TooSmall
 
         private void Guard()
         {
-            if (this.game.ObjectArray[6].Room == 0)
+            if (this.game.Items[6].Room == 0)
             {
                 this.Writeln("The guard sneezes and wakes up.  Deciding that he had better go do his rounds,");
                 this.Writeln("he gets up.  He is still sleepy enough that he doesn''t even notice when he");
@@ -528,9 +517,9 @@ namespace TooSmall
 
         private void InformUser()
         {
-            this.ui.displayRoomInfo(Room.rooms[this.game.CurrentRoom]);
-            this.Writeln(Room.rooms[this.game.CurrentRoom].Name);
-            this.Writeln(Room.rooms[this.game.CurrentRoom].Description);
+            this.ui.displayRoomInfo(game.Rooms[this.game.CurrentRoom]);
+            this.Writeln(game.Rooms[this.game.CurrentRoom].Name);
+            this.Writeln(game.Rooms[this.game.CurrentRoom].Description);
             this.DisplayObjects();
         }
 
@@ -592,15 +581,15 @@ namespace TooSmall
 
         private void Milbourne29()
         {
-            if (this.game.ObjectArray[11].Room == 0)
+            if (this.game.Items[11].Room == 0)
             {
                 this.Writeln("Janine the cat pounces on you and steals your gum, but when she tries to");
                 this.Writeln("eat it, she gets all tangled up and her ferocious jaws become fused.");
-                this.game.ObjectArray[11].Room = this.game.CurrentRoom;
+                this.game.Items[11].Room = this.game.CurrentRoom;
                 this.game.Inventory--;
-                this.game.ObjectArray[11].Carry = 0;
+                this.game.Items[11].Carry = 0;
             }
-            else if (this.game.ObjectArray[11].Room == this.game.CurrentRoom)
+            else if (this.game.Items[11].Room == this.game.CurrentRoom)
             {
                 this.Writeln("Janine is rolling around in the corner, tangled in a wad of bubble gum.");
             }
@@ -613,7 +602,7 @@ namespace TooSmall
 
         private void Milbourne36()
         {
-            if (this.game.ObjectArray[0x27].Room == this.game.CurrentRoom)
+            if (this.game.Items[0x27].Room == this.game.CurrentRoom)
             {
                 this.Writeln("Janine the cat is busily chewing on the cat toy.");
             }
@@ -637,7 +626,7 @@ namespace TooSmall
                 this.Writeln("You can't open that.");
                 return flag;
             }
-            if (this.game.ObjectArray[NounToken].Room != this.game.CurrentRoom)
+            if (this.game.Items[NounToken].Room != this.game.CurrentRoom)
             {
                 if (((this.game.CurrentRoom == 6) || (this.game.CurrentRoom == 10)) || (this.game.CurrentRoom == 0x20))
                 {
@@ -647,7 +636,7 @@ namespace TooSmall
                 this.Writeln("I don't see it here.");
                 return flag;
             }
-            if (this.game.ObjectArray[NounToken].Condition == 1)
+            if (this.game.Items[NounToken].Condition == 1)
             {
                 this.Writeln("It's locked.");
                 return flag;
@@ -715,13 +704,13 @@ namespace TooSmall
             {
                 this.Errorout(1, "");
             }
-            else if (this.game.ObjectArray[NounToken].Room != this.game.CurrentRoom)
+            else if (this.game.Items[NounToken].Room != this.game.CurrentRoom)
             {
                 this.Errorout(3, "");
             }
             else
             {
-                switch (this.game.ObjectArray[NounToken].Carry)
+                switch (this.game.Items[NounToken].Carry)
                 {
                     case 0:
                         this.Writeln("No matter how much effort you exert, it refuses to move.");
@@ -746,12 +735,12 @@ namespace TooSmall
 
         private void Rat()
         {
-            if (this.game.ObjectArray[0x20].Room == 0x25)
+            if (this.game.Items[0x20].Room == 0x25)
             {
                 this.Writeln("The rat pounces on the cheese and it is gone almost instantly.  The rat then turns its head back in your direction in a threatening manner.");
-                this.game.ObjectArray[0x20].Room = 0xff;
+                this.game.Items[0x20].Room = 0xff;
             }
-            else if (this.game.ObjectArray[0x20].Room == 0)
+            else if (this.game.Items[0x20].Room == 0)
             {
                 this.Writeln("The rat seems to be begging for something");
             }
@@ -770,7 +759,7 @@ namespace TooSmall
                 return false;
             }
             bool flag = true;
-            if (this.game.ObjectArray[NounToken].Room != this.game.CurrentRoom)
+            if (this.game.Items[NounToken].Room != this.game.CurrentRoom)
             {
                 this.Errorout(3, "");
                 return flag;
@@ -828,14 +817,14 @@ namespace TooSmall
             {
                 this.Errorout(1, "");
             }
-            else if ((this.game.ObjectArray[NounToken].Room != this.game.CurrentRoom) || (this.game.ObjectArray[NounToken].Condition == 2))
+            else if ((this.game.Items[NounToken].Room != this.game.CurrentRoom) || (this.game.Items[NounToken].Condition == 2))
             {
-                if (this.game.ObjectArray[NounToken].Condition == 2)
+                if (this.game.Items[NounToken].Condition == 2)
                 {
                     this.Writeln("You cannot move it because one of the wheels is broken and you're not big");
                     this.Writeln("enough to carry it.");
                 }
-                else if (this.game.ObjectArray[NounToken].Room == 0)
+                else if (this.game.Items[NounToken].Room == 0)
                 {
                     this.Errorout(4, "");
                 }
@@ -848,11 +837,11 @@ namespace TooSmall
             {
                 if (this.game.Inventory < 5)
                 {
-                    if ((this.game.ObjectArray[NounToken].Carry == 1) || ((this.game.ObjectArray[NounToken].Carry == 2) && this.game.Strength))
+                    if ((this.game.Items[NounToken].Carry == 1) || ((this.game.Items[NounToken].Carry == 2) && this.game.Strength))
                     {
-                        this.game.ObjectArray[NounToken].Room = 0;
+                        this.game.Items[NounToken].Room = 0;
                         this.game.Inventory++;
-                        this.Writeln(this.game.ObjectArray[NounToken].Name + " taken.");
+                        this.Writeln(this.game.Items[NounToken].Name + " taken.");
                     }
                     else
                     {
@@ -875,30 +864,30 @@ namespace TooSmall
                 this.Errorout(1, "");
                 return false;
             }
-            if (this.game.ObjectArray[NounToken].Room != 0)
+            if (this.game.Items[NounToken].Room != 0)
             {
                 this.Errorout(5, "");
                 return false;
             }
             if (this.game.CurrentRoom == 0x2e)
             {
-                this.game.ObjectArray[NounToken].Room = 0x2c;
+                this.game.Items[NounToken].Room = 0x2c;
             }
             else
             {
-                this.game.ObjectArray[NounToken].Room = this.game.CurrentRoom;
+                this.game.Items[NounToken].Room = this.game.CurrentRoom;
             }
             this.game.Inventory--;
-            this.Writeln(this.game.ObjectArray[NounToken].Name + " thrown.");
+            this.Writeln(this.game.Items[NounToken].Name + " thrown.");
             return true;
         }
 
         public int tokenizeNoun(string noun)
         {
             int num = 0;
-            for (int i = 1; i < Noun.nouns.Length; i++)
+            for (int i = 1; i < game.Nouns.Length; i++)
             {
-                if (Noun.nouns[i].ToUpper().Equals(noun.ToUpper()))
+                if (game.Nouns[i].ToUpper().Equals(noun.ToUpper()))
                 {
                     num = i;
                 }
@@ -909,9 +898,9 @@ namespace TooSmall
         public int tokenizeVerb(string verb)
         {
             int num = 0;
-            for (int i = 1; i < Verb.verbs.Length; i++)
+            for (int i = 1; i < game.Verbs.Length; i++)
             {
-                string str = Verb.verbs[i];
+                string str = game.Verbs[i];
                 if (str.Length > 3)
                 {
                     str = str.Substring(0, 3);
@@ -941,7 +930,7 @@ namespace TooSmall
                 this.Writeln("You can't unlock that.");
                 return flag;
             }
-            if (this.game.ObjectArray[NounToken].Room != this.game.CurrentRoom)
+            if (this.game.Items[NounToken].Room != this.game.CurrentRoom)
             {
                 if (((this.game.CurrentRoom == 6) || (this.game.CurrentRoom == 10)) || (this.game.CurrentRoom == 0x20))
                 {
@@ -951,18 +940,18 @@ namespace TooSmall
                 this.Writeln("I don't see it here.");
                 return flag;
             }
-            if (this.game.ObjectArray[30].Room != 0)
+            if (this.game.Items[30].Room != 0)
             {
                 this.Writeln("You don't have any keys.");
                 return flag;
             }
-            if ((this.game.ObjectArray[5].Room != 0) && (this.game.ObjectArray[5].Room != this.game.CurrentRoom))
+            if ((this.game.Items[5].Room != 0) && (this.game.Items[5].Room != this.game.CurrentRoom))
             {
                 this.Writeln("You are not tall enough to reach the lock.");
                 return flag;
             }
             this.Writeln("The door is unlocked.");
-            this.game.ObjectArray[NounToken].Condition = 0;
+            this.game.Items[NounToken].Condition = 0;
             return flag;
         }
 
