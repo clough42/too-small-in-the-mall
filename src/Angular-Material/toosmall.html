@@ -13,16 +13,16 @@
 
             <md-toolbar>
                 <div class="md-toolbar-tools" layout="row" layout-align="space-between center">
-                    <span>In Your Cage</span>
+                    <span ng-bind="currentRoomName">--</span>
                     <span layout="row">
                         <span>Obvious Exits:</span>
                         &nbsp;
-                        <span>West</span>
+                        <span ng-bind="obviousExits">--</span>
                     </span>
                 </div>
             </md-toolbar>
 
-            <md-content flex layout-padding="">
+            <md-content flex layout-padding ng-bind-html-unsafe="textOutput">
                 <p>Lorem ipsum dolor sit amet, ne quod novum mei. Sea omnium invenire mediocrem at, in lobortis conclusionemque nam. Ne deleniti appetere reprimique pro, inani labitur disputationi te sed. At vix sale omnesque, id pro labitur reformidans accommodare, cum labores honestatis eu. Nec quem lucilius in, eam praesent reformidans no. Sed laudem aliquam ne.</p>
 
                 <p>
@@ -67,11 +67,10 @@
 
             </md-content>
 
-
             <md-content md-theme="docs-dark" >
                 <md-input-container class="md-block">
                     <label>Enter a Command</label>
-                    <input ng-model="input.command">
+                    <input autofocus ng-model="input.command">
                 </md-input-container>
             </md-content>
 
