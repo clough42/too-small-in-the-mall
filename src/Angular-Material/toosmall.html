@@ -82,7 +82,7 @@
 
             </md-content>
 
-            <md-content md-theme="docs-dark" >
+            <md-content ng-hide="gameOver">
                 <form ng-submit="submit()">
                     <md-input-container class="md-block">
                         <label>Enter a Command</label>
@@ -90,6 +90,16 @@
                     </md-input-container>
                 </form>
             </md-content>
+
+            <md-content ng-show="gameOver">
+                <form ng-submit="restart()">
+                    <md-input-container class="md-block">
+                        <md-button class="md-raised md-primary" type="submit" aria-label="Start Over">Start Over</md-button>
+                    </md-input-container>
+                </form>
+            </md-content>
+
+
 
         </div>
 

@@ -4,6 +4,7 @@ angular.module('tooSmall').controller('TooSmallCtrl', ['$scope', 'tooSmallEngine
     $scope.obviousExits = "Unknown";
     $scope.command = '';
     $scope.messageStream = [];
+    $scope.gameOver = false;
 
     var obviousExits = function(room) {
         return (((room.N > 0) ? " North" : "") + ((room.S > 0) ? " South" : "") + ((room.E > 0) ? " East" : "") + ((room.W > 0) ? " West" : "")).trim();
@@ -21,10 +22,18 @@ angular.module('tooSmall').controller('TooSmallCtrl', ['$scope', 'tooSmallEngine
 
     $scope.submit = function() {
         //if( $scope.command ) {
-            var result = tooSmallEngine.execute($scope.command, $scope.messageStream);
+            $scope.gameOver = tooSmallEngine.execute($scope.command, $scope.messageStream);
             updateRoomDisplay();
         //}
         $scope.command = '';
+    }
+
+    $scope.restart = function() {
+        $scope.gameOver = false;
+        $scope.command = "";
+        $scope.messageStream = [];
+        tooSmallEngine.restart();
+        updateRoomDisplay();
     }
 
 

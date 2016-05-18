@@ -1,7 +1,7 @@
 angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameData) {
 
     var previousRoom = 0;
-    var gameData = GameData;
+    var gameData = JSON.parse(JSON.stringify(GameData));
 
     function tokenize(list, word) {
         var num = 0;
@@ -48,6 +48,11 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
         return makeMessage('error', [message]);
     }
 
+    function makeSuccessMessage(message)
+    {
+        return makeMessage('done', [message]);
+    }
+
     function describeItems() {
         var items = [];
 
@@ -58,7 +63,7 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
         });
 
         if( items.length > 0 ) {
-            items = ['You can see:'].concat(items);
+            items = ['You can see: ' + items.join(", ")];
         }
 
         return items;
@@ -200,6 +205,240 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
         return flag;
     }
 
+    function Take(NounToken, messageStream)
+    {
+        if (NounToken == 0)
+        {
+            Errorout(1, "", messageStream);
+        }
+        else if ((gameData.Items[NounToken].Room != gameData.CurrentRoom) || (gameData.Items[NounToken].Condition == 2))
+        {
+            if (gameData.Items[NounToken].Condition == 2)
+            {
+                messageStream.push(makeErrorMessage("You cannot move it because one of the wheels is broken and you're not bigenough to carry it."));
+            }
+            else if (gameData.Items[NounToken].Room == 0)
+            {
+                Errorout(4, "", messageStream);
+            }
+            else
+            {
+                Errorout(3, "", messageStream);
+            }
+        }
+        else
+        {
+            if (gameData.Inventory < 5)
+            {
+                if ((gameData.Items[NounToken].Carry == 1) || ((gameData.Items[NounToken].Carry == 2) && gameData.Strength))
+                {
+                    gameData.Items[NounToken].Room = 0;
+                    gameData.Inventory++;
+                    messageStream.push(makeSuccessMessage(gameData.Items[NounToken].Name + " taken."));
+                }
+                else
+                {
+                    Errorout(6, "", messageStream);
+                }
+            }
+            else
+            {
+                Errorout(7, "", messageStream);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    function Drop(NounToken, messageStream)
+    {
+        if (NounToken == 0)
+        {
+            Errorout(1, "", messageStream);
+            return false;
+        }
+        if (gameData.Items[NounToken].Room != 0)
+        {
+            Errorout(5, "", messageStream);
+            return false;
+        }
+        gameData.Items[NounToken].Room = gameData.CurrentRoom;
+        gameData.Inventory--;
+        messageStream.push(makeSuccessMessage(gameData.Items[NounToken].Name + " dropped."));
+        return true;
+    }
+
+    function ThrowFunc(NounToken, messageStream)
+    {
+        if (NounToken == 0)
+        {
+            Errorout(1, "", messageStream);
+            return false;
+        }
+        if (gameData.Items[NounToken].Room != 0)
+        {
+            Errorout(5, "", messageStream);
+            return false;
+        }
+        if (gameData.CurrentRoom == 0x2e)
+        {
+            gameData.Items[NounToken].Room = 0x2c;
+        }
+        else
+        {
+            gameData.Items[NounToken].Room = gameData.CurrentRoom;
+        }
+        gameData.Inventory--;
+        messageStream.push(makeSuccessMessage(gameData.Items[NounToken].Name + " thrown."));
+        return true;
+    }
+
+    function Guard(messageStream)
+    {
+        if (gameData.Items[6].Room == 0)
+        {
+            messageStream.push(makeMessage('not_interested', ["The guard sneezes and wakes up.  Deciding that he had better go do his rounds, "+
+                "he gets up.  He is still sleepy enough that he doesn''t even notice when he " +
+                "steps on you on his way out of the room."]));
+            gameData.Dead = true;
+        }
+        else
+        {
+            messageStream.push(makeMessage('play_arrow', ["The guard is snoring loudly."]));
+        }
+    }
+
+    function Milbourne29(messageStream)
+    {
+        if (gameData.Items[11].Room == 0)
+        {
+            messageStream.push(makeMessage('play_arrow', ["Janine the cat pounces on you and steals your gum, but when she tries to "+
+                "eat it, she gets all tangled up and her ferocious jaws become fused."]));
+            gameData.Items[11].Room = gameData.CurrentRoom;
+            gameData.Inventory--;
+            gameData.Items[11].Carry = 0;
+        }
+        else if (gameData.Items[11].Room == gameData.CurrentRoom)
+        {
+            messageStream.push(makeMessage('play_arrow', ["Janine is rolling around in the corner, tangled in a wad of bubble gum."]));
+        }
+        else
+        {
+            messageStream.push(makeMessage('not_interested', ["Janine the cat jumps on you and begins to eat.  You are now quite dead."]));
+            gameData.Dead = true;
+        }
+    }
+
+    function Rat(messageStream)
+    {
+        if (gameData.Items[0x20].Room == 0x25)
+        {
+            messageStream.push(makeMessage('play_arrow', ["The rat pounces on the cheese and it is gone almost instantly.  The rat then turns its head back in your direction in a threatening manner."]));
+            gameData.Items[0x20].Room = 0xff;
+        }
+        else if (gameData.Items[0x20].Room == 0)
+        {
+            messageStream.push(makeMessage('play_arrow', ["The rat seems to be begging for something"]));
+        }
+        else
+        {
+            messageStream.push(makeMessage('not_interested', ["The rat pounces on you and you are soon quite dead."]));
+            gameData.Dead = true;
+        }
+    }
+
+    function Milbourne36(messageStream)
+    {
+        if (gameData.Items[0x27].Room == gameData.CurrentRoom)
+        {
+            messageStream.push(makeMessage('play_arrow',["Janine the cat is busily chewing on the cat toy."]));
+        }
+        else
+        {
+            messageStream.push(makeMessage('not_interested',["Janine, because she has nothing else to play with, decides to chew on you for a while.  You have become quite dead."]));
+            gameData.Dead = true;
+        }
+    }
+
+    function Parrot(messageStream)
+    {
+        var num = Math.floor(Math.random() * 10);
+        switch (num)
+        {
+            case 0:
+                messageStream.push(makeMessage('chat', ["From the parrot: Hello, Hello"]));
+                return;
+
+            case 1:
+                messageStream.push(makeMessage('chat', ["From the parrot: Haaa! Ha! Ha! Ha! Haaa!"]));
+                return;
+
+            case 2:
+                messageStream.push(makeMessage('chat', ["From the parrot: Beware of large cats."]));
+                return;
+
+            case 3:
+                messageStream.push(makeMessage('chat', ["From the parrot: Violence will accomplish nothing."]));
+                return;
+
+            case 4:
+                messageStream.push(makeMessage('chat', ["From the parrot: A penny saved is a penny."]));
+                return;
+
+            case 5:
+                messageStream.push(makeMessage('chat', ["From the parrot: Nothing is ever as simple as it first seems."]));
+                return;
+
+            case 6:
+                messageStream.push(makeMessage('chat', ["From the parrot: Go West, Short One, go West."]));
+                return;
+
+            case 7:
+                messageStream.push(makeMessage('chat', ["From the parrot: The hospital called, your brain is ready."]));
+                return;
+
+            case 8:
+                messageStream.push(makeMessage('chat', ["From the parrot: I'm allergic to cats."]));
+                return;
+
+            case 9:
+                messageStream.push(makeMessage('chat', ["From the parrot: Leftover nuts never match leftover bolts."]));
+                return;
+        }
+    }
+
+    function Animate(messageStream)
+    {
+        for (i = 1; i < gameData.Items.length; i++)
+        {
+            if ((gameData.Items[i].Carry == 3) && (gameData.Items[i].Room == gameData.CurrentRoom))
+            {
+                switch (i)
+                {
+                    case 28:
+                        Guard(messageStream);
+                        break;
+
+                    case 29:
+                        Milbourne29(messageStream);
+                        break;
+
+                    case 0x1f:
+                        Rat(messageStream);
+                        break;
+
+                    case 0x24:
+                        Milbourne36(messageStream);
+                        break;
+
+                    case 8:
+                        Parrot(messageStream);
+                        break;
+                }
+            }
+        }
+    }
+
     function handleUserCommand(command, messageStream) {
         // handle command
         var parsed = parseCommand(command);
@@ -208,10 +447,26 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
             case 0:
                 if( command.length != 0 ) {
                     Errorout(1, "", messageStream);
-                    return;
+                    return false;
                 }
                 Errorout(0, "", messageStream);
-                return;
+                return false;
+
+            case 1:
+            case 2:
+            case 13:
+            case 0x2c:
+            case 50:
+                return Take(parsed.noun, messageStream);
+
+            case 3:
+            case 4:
+            case 0x33:
+                return Drop(parsed.noun, messageStream);
+
+            case 7:
+            case 0x2e:
+                return ThrowFunc(parsed.noun, messageStream);
 
             case 14:
             case 0x1a:
@@ -239,20 +494,27 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
         messageStream.push(makeUserMessage([command]));
 
         // handle command
-        var ret = handleUserCommand(command, messageStream);
+        handleUserCommand(command, messageStream);
 
         // output room description, if we've moved
         if( gameData.CurrentRoom != previousRoom ) {
             describeRoom(messageStream)
         }
 
-        return ret;
+        Animate(messageStream);
+
+        return gameData.Dead || gameData.Out || gameData.Quit;
+    }
+
+    function restart() {
+        gameData = JSON.parse(JSON.stringify(GameData));
     }
 
     return {
         'execute': execute,
         'getCurrentRoom': getCurrentRoom,
-        'describeRoom': describeRoom
+        'describeRoom': describeRoom,
+        'restart': restart
     };
 
 }]);
