@@ -31,6 +31,7 @@ angular.module('tooSmall').controller('TooSmallCtrl', ['$scope', 'tooSmallEngine
 
     // initialization
     updateRoomDisplay();
+    $scope.history.push(tooSmallEngine.describeRoom());
 
 }]);
 

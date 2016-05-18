@@ -30,9 +30,27 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
         };
     }
 
+    function describeItems() {
+        var items = [];
+
+        angular.forEach(gameData.Items, function(item) {
+            if( item.Room == gameData.CurrentRoom ) {
+                items.push(item.Name);
+            }
+        });
+
+        if( items.length > 0 ) {
+            items = ['You can see:'].concat(items);
+        }
+
+        return items;
+    }
+
     function describeRoom() {
         var room = gameData.Rooms[gameData.CurrentRoom];
-        return makeMessage('room', [room.Name,room.Description]);
+        var messages = [room.Name,room.Description];
+        messages = messages.concat(describeItems());
+        return makeMessage('room', messages);
     }
 
     function execute(command) {
