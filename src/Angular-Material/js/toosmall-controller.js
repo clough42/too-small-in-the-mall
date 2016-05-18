@@ -3,10 +3,10 @@ angular.module('tooSmall').controller('TooSmallCtrl', ['$scope', 'tooSmallEngine
     $scope.currentRoomName = "Unknown";
     $scope.obviousExits = "Unknown";
     $scope.command = '';
-    $scope.history = [];
+    $scope.messageStream = [];
 
     var obviousExits = function(room) {
-        return ((room.N > 0) ? " North" : "") + ((room.S > 0) ? " South" : "") + ((room.E > 0) ? " East" : "") + ((room.W > 0) ? " West" : "").trim();
+        return (((room.N > 0) ? " North" : "") + ((room.S > 0) ? " South" : "") + ((room.E > 0) ? " East" : "") + ((room.W > 0) ? " West" : "")).trim();
     }
 
     function updateRoomDisplay() {
@@ -20,18 +20,17 @@ angular.module('tooSmall').controller('TooSmallCtrl', ['$scope', 'tooSmallEngine
     }
 
     $scope.submit = function() {
-        if( $scope.command ) {
-            var result = tooSmallEngine.execute($scope.command);
-            pushArray($scope.history, result);
+        //if( $scope.command ) {
+            var result = tooSmallEngine.execute($scope.command, $scope.messageStream);
             updateRoomDisplay();
-        }
+        //}
         $scope.command = '';
     }
 
 
     // initialization
     updateRoomDisplay();
-    $scope.history.push(tooSmallEngine.describeRoom());
+    tooSmallEngine.describeRoom($scope.messageStream);
 
 }]);
 

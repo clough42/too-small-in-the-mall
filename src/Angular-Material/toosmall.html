@@ -55,7 +55,7 @@
                 </div>
 
                 <md-list>
-                    <md-list-item ng-repeat="item in history">
+                    <md-list-item ng-repeat="item in messageStream">
                         <div ng-if="!item.user" layout="row" layout-align="start center" layout-fill>
                             <div><i class="material-icons">{{item.icon}}</i></div>
                             <div layout="column" layout-align="start center" flex>
@@ -70,7 +70,7 @@
                             <div layout="column" layout-align="end center">
                                 <md-list layout-fill>
                                     <md-list-item ng-repeat="message in item.messages">
-                                        <div align="right" layout-fill>{{message}}</div>
+                                        <div layout-fill>{{message}}</div>
                                     </md-list-item>
                                 </md-list>
                             </div>
