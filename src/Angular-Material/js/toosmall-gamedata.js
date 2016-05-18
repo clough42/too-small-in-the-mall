@@ -659,7 +659,7 @@ angular.module('tooSmall').factory('GameData', function() {
             }
         ],
         "Verbs": [
-            "__DUMMY_PLACEHOLDER__",
+            "",
             "GET",
             "TAKE",
             "PUT",
@@ -715,7 +715,7 @@ angular.module('tooSmall').factory('GameData', function() {
             "INVENTOR"
         ],
         "Nouns": [
-            "__DUMMY_PLACEHOLDER__",
+            "",
             "DESK",
             "SOFA",
             "TABLE",

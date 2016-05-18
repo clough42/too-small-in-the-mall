@@ -3,11 +3,26 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
     var previousRoom = 0;
     var gameData = GameData;
 
+    function tokenize(list, word) {
+        var num = 0;
+
+        if (word) {
+            for (i = 1; i < list.length; i++) {
+                var listword = list[i].substring(0, 3);
+                word = word.substring(0, 3);
+                if (word == listword) {
+                    num = i;
+                }
+            }
+        }
+        return num;
+    }
+
     function parseCommand(command) {
         var words = command.toUpperCase().split(" ",2);
         return {
-            'verb': GameData.Verbs.indexOf(words[0]),
-            'noun': GameData.Nouns.indexOf(words[1])
+            'verb': tokenize(GameData.Verbs, words[0]),
+            'noun': tokenize(GameData.Nouns, words[1])
         };
     }
 
@@ -190,7 +205,7 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
         var parsed = parseCommand(command);
 
         switch( parsed.verb ) {
-            case -1:
+            case 0:
                 if( command.length != 0 ) {
                     Errorout(1, "", messageStream);
                     return;
