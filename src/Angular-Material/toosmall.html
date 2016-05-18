@@ -56,15 +56,25 @@
 
                 <md-list>
                     <md-list-item ng-repeat="item in history">
-                        <div layout="row" layout-align="start center">
+                        <div ng-if="item.user" layout="row" layout-align="start center" layout-fill>
                             <div><i class="material-icons">{{item.icon}}</i></div>
                             <div layout="column" layout-align="start center" flex>
-                                <md-list>
+                                <md-list layout-fill>
                                     <md-list-item ng-repeat="message in item.messages">
                                         <div>{{message}}</div>
                                     </md-list-item>
                                 </md-list>
                             </div>
+                        </div>
+                        <div ng-if="!item.user" layout="row" layout-align="end center" layout-fill>
+                            <div layout="column" layout-align="end center">
+                                <md-list layout-fill>
+                                    <md-list-item ng-repeat="message in item.messages">
+                                        <div align="right" layout-fill>{{message}}</div>
+                                    </md-list-item>
+                                </md-list>
+                            </div>
+                            <div><i class="material-icons">{{item.icon}}</i></div>
                         </div>
                         <md-divider/>
                     </md-list-item>
