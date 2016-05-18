@@ -215,7 +215,7 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
         {
             if (gameData.Items[NounToken].Condition == 2)
             {
-                messageStream.push(makeErrorMessage("You cannot move it because one of the wheels is broken and you're not bigenough to carry it."));
+                messageStream.push(makeErrorMessage("You cannot move it because one of the wheels is broken and you're not big enough to carry it."));
             }
             else if (gameData.Items[NounToken].Room == 0)
             {
@@ -293,11 +293,84 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
         return true;
     }
 
+    function Push(NounToken, messageStream)
+    {
+        if (NounToken == 0)
+        {
+            Errorout(1, "", messageStream);
+        }
+        else if (gameData.Items[NounToken].Room != gameData.CurrentRoom)
+        {
+            Errorout(3, "", messageStream);
+        }
+        else
+        {
+            switch (gameData.Items[NounToken].Carry)
+            {
+                case 0:
+                    messageStream.push(makeErrorMessage("No matter how much effort you exert, it refuses to move."));
+                    break;
+
+                case 1:
+                    messageStream.push(makeSuccessMessage("It moves."));
+                    break;
+
+                case 2:
+                    messageStream.push(makeSuccessMessage("With great effort, you can make it move, but not over any great distance."));
+                    break;
+
+                case 3:
+                    messageStream.push(makeErrorMessage("It refuses to let you move it."));
+                    break;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    function Hit(messageStream)
+    {
+        messageStream.push(makeMessage('warning', [ "I warn you, your meager attempts at violence will bring about your end."]));
+        return true;
+    }
+
+    function Jump(messageStream)
+    {
+        if (gameData.CurrentRoom == 0x2e)
+        {
+            messageStream.push(makeMessage('sentiment_very_dissatisfied', ["You should really be more careful about heights.  I will spare you the " +
+                "details, but you are now quite dead."]));
+            gameData.Dead = true;
+        }
+        else
+        {
+            messageStream.push(makeSuccessMessage("Wheeeeeeeee!  Doesn't that just thrill you?"));
+        }
+        return true;
+    }
+
+    function Help(messageStream)
+    {
+        messageStream.push(makeMessage('live_help', [
+        "Enter your commands as two words--a verb and a noun.  (take rock, climb rope)",
+        "Some commands require only one word.  (n, north, west)",
+        "Many objects have more than one word in their name, but each is still " +
+        "referred to with one word that best describes it.",
+        "Have fun and be careful.  Remember, you're only a foot tall."]));
+        return false;
+    }
+
+    function Say(messageStream)
+    {
+        messageStream.push(makeMessage('sentiment_dissatisfied', ["Are you talking to yourself?"]));
+        return true;
+    }
+
     function Guard(messageStream)
     {
         if (gameData.Items[6].Room == 0)
         {
-            messageStream.push(makeMessage('not_interested', ["The guard sneezes and wakes up.  Deciding that he had better go do his rounds, "+
+            messageStream.push(makeMessage('sentiment_very_dissatisfied', ["The guard sneezes and wakes up.  Deciding that he had better go do his rounds, "+
                 "he gets up.  He is still sleepy enough that he doesn''t even notice when he " +
                 "steps on you on his way out of the room."]));
             gameData.Dead = true;
@@ -324,7 +397,7 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
         }
         else
         {
-            messageStream.push(makeMessage('not_interested', ["Janine the cat jumps on you and begins to eat.  You are now quite dead."]));
+            messageStream.push(makeMessage('sentiment_very_dissatisfied', ["Janine the cat jumps on you and begins to eat.  You are now quite dead."]));
             gameData.Dead = true;
         }
     }
@@ -342,7 +415,7 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
         }
         else
         {
-            messageStream.push(makeMessage('not_interested', ["The rat pounces on you and you are soon quite dead."]));
+            messageStream.push(makeMessage('sentiment_very_dissatisfied', ["The rat pounces on you and you are soon quite dead."]));
             gameData.Dead = true;
         }
     }
@@ -355,7 +428,7 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
         }
         else
         {
-            messageStream.push(makeMessage('not_interested',["Janine, because she has nothing else to play with, decides to chew on you for a while.  You have become quite dead."]));
+            messageStream.push(makeMessage('sentiment_very_dissatisfied',["Janine, because she has nothing else to play with, decides to chew on you for a while.  You have become quite dead."]));
             gameData.Dead = true;
         }
     }
@@ -464,9 +537,34 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
             case 0x33:
                 return Drop(parsed.noun, messageStream);
 
+            case 5:
+            case 0x1b:
+            case 0x1c:
+            case 0x2d:
+                return Push(parsed.noun, messageStream);
+
+            case 6:
+            case 15:
+            case 0x10:
+            case 0x1d:
+            case 0x2a:
+            case 0x2f:
+            case 0x30:
+            case 0x31:
+                return Hit(messageStream);
+
             case 7:
             case 0x2e:
                 return ThrowFunc(parsed.noun, messageStream);
+
+            case 8:
+                return Help(messageStream);
+
+            case 9:
+                return Jump(messageStream);
+
+            case 10:
+                return Say(messageStream);
 
             case 14:
             case 0x1a:
