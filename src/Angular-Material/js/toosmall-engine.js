@@ -381,6 +381,370 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
         }
     }
 
+    function Yell(messageStream)
+    {
+        messageStream.push(makeMessage('sms_failed', ["Aaaaarrrgh!",
+            "Do you feel better now?"]));
+        return true;
+    }
+
+    function Examine(NounToken, messageStream)
+    {
+        switch (NounToken)
+        {
+            case 1:
+                messageStream.push(makeMessage('info',["It is a large oak desk."]));
+                break;
+
+            case 2:
+                messageStream.push(makeMessage('info',["It is a very lagre, soft sofa."]));
+                break;
+
+            case 3:
+                messageStream.push(makeMessage('info',["It is tall and the legs are too smooth to climb."]));
+                break;
+
+            case 4:
+                messageStream.push(makeMessage('info',["It's just a dumb old recliner."]));
+                break;
+
+            case 5:
+                messageStream.push(makeMessage('info',["It is too heavy to carry, but you might be able to roll it."]));
+                break;
+
+            case 6:
+                messageStream.push(makeMessage('info',["This seems to be very special cat hair."]));
+                break;
+
+            case 7:
+                messageStream.push(makeMessage('info',["It is locked."]));
+                break;
+
+            case 8:
+                messageStream.push(makeMessage('info',["The parrot flies away whenever you try to get close to it."]));
+                break;
+
+            case 9:
+                messageStream.push(makeMessage('info',["The cat food is brown and crunchy."]));
+                break;
+
+            case 10:
+                messageStream.push(makeMessage('info',["This cage contains a deadly cobra."]));
+                break;
+
+            case 11:
+                messageStream.push(makeMessage('info',["The bubble gum is soft and it looks delicious."]));
+                break;
+
+            case 12:
+                messageStream.push(makeMessage('info',["The popcorn is crisp and appetizing."]));
+                break;
+
+            case 13:
+                messageStream.push(makeMessage('info',["The jelly beans are soft and they look terrible."]));
+                break;
+
+            case 14:
+                messageStream.push(makeMessage('info',["It is turned off and there is no power switch."]));
+                break;
+
+            case 15:
+                messageStream.push(makeMessage('info',["They are too small for you."]));
+                break;
+
+            case 0x10:
+                messageStream.push(makeMessage('info',["It has no batteries."]));
+                break;
+
+            case 0x11:
+                messageStream.push(makeMessage('info',["It is wrapped up tightly."]));
+                break;
+
+            case 0x12:
+                messageStream.push(makeMessage('info',["It looks like quite the deadly weapon."]));
+                break;
+
+            case 0x13:
+                messageStream.push(makeMessage('info',["It's a brand new flat-head screwdriver."]));
+                break;
+
+            case 20:
+                messageStream.push(makeMessage('info',["This belt sander looks quite deadly."]));
+                break;
+
+            case 0x15:
+                messageStream.push(makeMessage('info',["It has a bunch of writing on it."]));
+                break;
+
+            case 0x16:
+                messageStream.push(makeMessage('info',["It is stark naked."]));
+                break;
+
+            case 0x17:
+                messageStream.push(makeMessage('info',["It's just a plain old plastic coat hanger."]));
+                break;
+
+            case 0x18:
+                messageStream.push(makeMessage('info',["It is small, round and white."]));
+                break;
+
+            case 0x19:
+                messageStream.push(makeMessage('info',["It is blue and pink and very small."]));
+                break;
+
+            case 0x1a:
+                messageStream.push(makeMessage('info',["It is unplugged and the cord is out of your reach."]));
+                break;
+
+            case 0x1b:
+                messageStream.push(makeMessage('info',["It's very slimy.  It might come in handy."]));
+                break;
+
+            case 0x1c:
+                messageStream.push(makeMessage('info',["He is sleeping.  Don't disturb him."]));
+                break;
+
+            case 0x1d:
+                messageStream.push(makeMessage('info',["The white cat looks quite deadly."]));
+                break;
+
+            case 30:
+                messageStream.push(makeMessage('info',["It looks like a bunch of keys on a metal ring."]));
+                break;
+
+            case 0x1f:
+                messageStream.push(makeMessage('info',["He is large, black and ugly."]));
+                break;
+
+            case 0x20:
+                messageStream.push(makeMessage('info',["Swiss cheese, my favorite."]));
+                break;
+
+            case 0x21:
+                messageStream.push(makeMessage('info',["It is a bunch of crunchy flakes."]));
+                break;
+
+            case 0x22:
+                messageStream.push(makeMessage('info',["It is hard, round and made of metal."]));
+                break;
+
+            case 0x23:
+                messageStream.push(makeMessage('info',["Some dumb sports magazine."]));
+                break;
+
+            case 0x24:
+                messageStream.push(makeMessage('info',["The large, white cat looks dangerous."]));
+                break;
+
+            case 0x25:
+                messageStream.push(makeMessage('info',["It runs from the floor to the top of the bookcase where it enters the wall."]));
+                break;
+
+            case 0x26:
+                messageStream.push(makeMessage('info',["It is tall and smooth."]));
+                break;
+
+            case 0x27:
+                messageStream.push(makeMessage('info',["It looks well used."]));
+                break;
+
+            case 0x2b:
+                messageStream.push(makeMessage('info',["It is tall and looks like a door with a window in it."]));
+                break;
+
+            case 0:
+                Errorout(1, "");
+                return false;
+        }
+        return true;
+    }
+
+    function Fix(NounToken, messageStream)
+    {
+        var flag = true;
+        if (NounToken == 0)
+        {
+            Errorout(1, "", messageStream);
+            return false;
+        }
+        if (gameData.Items[NounToken].Room != gameData.CurrentRoom)
+        {
+            Errorout(3, "", messageStream);
+            return flag;
+        }
+        if (gameData.Items[NounToken].Condition != 2)
+        {
+            messageStream.push(makeErrorMessage("It's not broken."));
+            return flag;
+        }
+        if (gameData.Items[0x13].Room != 0)
+        {
+            messageStream.push(makeErrorMessage("You don't have the proper tools."));
+            return flag;
+        }
+        gameData.Items[NounToken].Condition -= 2;
+        messageStream.push(makeSuccessMessage("Fixed."));
+        return flag;
+    }
+
+    function DisplayInventory(messageStream)
+    {
+        var text = [];
+        var flag = true;
+        text.push("You have in your posession:");
+        for (i = 1; i < gameData.Items.length; i++)
+        {
+            var item = gameData.Items[i];
+            if (item.Room == 0)
+            {
+                text.push(item.Name);
+                flag = false;
+            }
+        }
+        if (flag)
+        {
+            text.push("     (nothing)");
+        }
+
+        messageStream.push(makeMessage('info', text));
+        return true;
+    }
+
+    function ReadFunc(NounToken, messageStream)
+    {
+        if (NounToken == 0)
+        {
+            Errorout(1, "", messageStream);
+            return false;
+        }
+        var flag = true;
+        if (gameData.Items[NounToken].Room != gameData.CurrentRoom)
+        {
+            Errorout(3, "", messageStream);
+            return flag;
+        }
+        if (NounToken != 0x15)
+        {
+            messageStream.push(makeErrorMessage("There is no writing here of any importance."));
+            return flag;
+        }
+        messageStream.push(makeSuccessMessage("There is a map of the mall here, but that'd make it too easy, wouldn't it?"));
+        return flag;
+    }
+
+    function Eat(NounToken, messageStream)
+    {
+        var flag2 = true;
+        var flag = false;
+        if (NounToken == 0)
+        {
+            Errorout(1, "", messageStream);
+            flag = true;
+            flag2 = false;
+        }
+        if ((gameData.Items[NounToken].Room != 0) && !flag)
+        {
+            Errorout(5, "", messageStream);
+            flag = true;
+        }
+        if (!flag)
+        {
+            if ((((NounToken == 6) || (NounToken == 9)) || ((NounToken == 11) || (NounToken == 12))) || ((((NounToken == 13) || (NounToken == 0x18)) || ((NounToken == 0x19) || (NounToken == 0x1b))) || ((NounToken == 0x20) || (NounToken == 0x21))))
+            {
+                messageStream.push(makeSuccessMessage("Eaten."));
+                gameData.Inventory--;
+                gameData.Items[NounToken].Room = 0xff;
+                switch (NounToken)
+                {
+                    case 0x18:
+                        gameData.Strength = true;
+                        messageStream.push(makeSuccessMessage("After a few minutes, you begin to feel much stronger than you did before."));
+                        return flag2;
+
+                    case 0x19:
+                        gameData.Dead = true;
+                        messageStream.push(makeErrorMessage("You really shouldn't eat things you find on the floor.  You are now beginning" +
+                            "to feel quite dead."));
+                        return flag2;
+                }
+                return flag2;
+            }
+            messageStream.push(makeErrorMessage("You can't eat that."));
+        }
+        return flag2;
+    }
+
+    function Open(NounToken, messageStream)
+    {
+        if (NounToken == 0)
+        {
+            Errorout(1, "", messageStream);
+            return false;
+        }
+        var flag = true;
+        if (NounToken != 0x2b)
+        {
+            messageStream.push(makeErrrorMessage("You can't open that."));
+            return flag;
+        }
+        if (gameData.Items[NounToken].Room != gameData.CurrentRoom)
+        {
+            if (((gameData.CurrentRoom == 6) || (gameData.CurrentRoom == 10)) || (gameData.CurrentRoom == 0x20))
+            {
+                messageStream.push(makeErrorMessage("It's jammed shut."));
+                return flag;
+            }
+            messageStream.push(makeErrorMessage("I don't see it here."));
+            return flag;
+        }
+        if (gameData.Items[NounToken].Condition == 1)
+        {
+            messageStream.push(makeErrorMessage("It's locked."));
+            return flag;
+        }
+        messageStream.push(makeSuccessMessage("The door slowly swings open and you see daylight peeking over the horizon."));
+        gameData.Out = true;
+        return flag;
+    }
+
+    function Unlock(NounToken, messageStream)
+    {
+        if (NounToken == 0)
+        {
+            Errorout(1, "", messageStream);
+            return false;
+        }
+        var flag = true;
+        if (NounToken != 0x2b)
+        {
+            messageStream.push(makeErrorMessage("You can't unlock that."));
+            return flag;
+        }
+        if (gameData.Items[NounToken].Room != gameData.CurrentRoom)
+        {
+            if (((gameData.CurrentRoom == 6) || (gameData.CurrentRoom == 10)) || (gameData.CurrentRoom == 0x20))
+            {
+                messageStream.push(makeErrorMessage("The lock is jammed."));
+                return flag;
+            }
+            messageStream.makeErrorMessage("I don't see it here.");
+            return flag;
+        }
+        if (gameData.Items[30].Room != 0)
+        {
+            messageStream.push(makeErrorMessage("You don't have any keys."));
+            return flag;
+        }
+        if ((gameData.Items[5].Room != 0) && (gameData.Items[5].Room != gameData.CurrentRoom))
+        {
+            messageStream.push(makeErrorMessage("You are not tall enough to reach the lock."));
+            return flag;
+        }
+        messageStream.push(makeSuccessMessage("The door is unlocked."));
+        gameData.Items[NounToken].Condition = 0;
+        return flag;
+    }
+
     function Milbourne29(messageStream)
     {
         if (gameData.Items[11].Room == 0)
@@ -566,6 +930,10 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
             case 10:
                 return Say(messageStream);
 
+            case 11:
+            case 12:
+                return Eat(parsed.noun, messageStream);
+
             case 14:
             case 0x1a:
                 return Go(parsed.noun - 0x16, messageStream);
@@ -582,6 +950,42 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
             case 0x18:
             case 0x19:
                 return Go(parsed.verb, messageStream);
+
+            case 30:
+                return Yell(messageStream);
+
+            case 0x1f:
+                return Open(parsed.noun, messageStream);
+
+            case 0x22:
+                return Unlock(parsed.noun, messageStream);
+
+            //case 0x23:
+                //return this.Save();
+
+            //case 0x24:
+                //return this.Load();
+
+            case 0x25:
+                gameData.Quit = true;
+                return true;
+
+            case 0x26:
+            case 40:
+                describeRoom(messageStream);
+                return true;
+
+            case 0x27:
+                return Examine(parsed.noun, messageStream);
+
+            case 0x29:
+                return ReadFunc(parsed.noun, messageStream);
+
+            case 0x34:
+                return Fix(parsed.noun, messageStream);
+
+            case 0x35:
+                return DisplayInventory(messageStream);
         }
     }
 
