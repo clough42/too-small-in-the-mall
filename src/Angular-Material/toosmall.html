@@ -13,10 +13,15 @@
     <body>
         <div ng-controller="TooSmallCtrl" ng-cloak="" ng-app="tooSmall" layout="column" layout-fill scroll-glue>
 
+            <md-toolbar hide-xs>
+                <div class="md-toolbar-tools" layout="row" layout-align="space-between center">
+                    <span class="md-display-1"><h2>Too Small in the Mall</h2></span>
+                </div>
+            </md-toolbar>
             <md-toolbar>
                 <div class="md-toolbar-tools" layout="row" layout-align="space-between center">
                     <span ng-bind="currentRoomName">--</span>
-                    <span layout="row">
+                    <span layout="row" hide-xs>
                         <span>Obvious Exits:</span>
                         &nbsp;
                         <span ng-bind="obviousExits">--</span>
