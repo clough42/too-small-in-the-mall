@@ -371,7 +371,7 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
         if (gameData.Items[6].Room == 0)
         {
             messageStream.push(makeMessage('sentiment_very_dissatisfied', ["The guard sneezes and wakes up.  Deciding that he had better go do his rounds, "+
-                "he gets up.  He is still sleepy enough that he doesn''t even notice when he " +
+                "he gets up.  He is still sleepy enough that he doesn't even notice when he " +
                 "steps on you on his way out of the room."]));
             gameData.Dead = true;
         }
@@ -876,6 +876,50 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
         }
     }
 
+    function Save(messageStream)
+    {
+        if( !storageAvailable('localStorage') ) {
+            messageStream.push(makeErrorMessage("You browser does not support saving games."));
+            return false;
+        }
+        localStorage.tooSmallSavedGame = JSON.stringify(gameData);
+        messageStream.push(makeSuccessMessage("Game progress saved."));
+        localStorage.tooSmallSavedStream = JSON.stringify(messageStream);
+    }
+
+    function Load(messageStream)
+    {
+        if( !storageAvailable('localStorage') ) {
+            messageStream.push(makeErrorMessage("You browser does not support saving games."));
+            return false;
+        }
+
+        if( !localStorage.tooSmallSavedGame || !localStorage.tooSmallSavedStream ) {
+            messageStream.push(makeErrorMessage("No saved game data found in this browser."));
+        }
+
+        gameData = JSON.parse(localStorage.tooSmallSavedGame);
+        messageStream.length = 0;
+        angular.forEach(JSON.parse(localStorage.tooSmallSavedStream), function(message) {
+            messageStream.push(message);
+        });
+
+        messageStream.push(makeSuccessMessage("Game progress loaded."));
+    }
+
+    function storageAvailable(type) {
+        try {
+            var storage = window[type],
+                x = '__storage_test__';
+            storage.setItem(x, x);
+            storage.removeItem(x);
+            return true;
+        }
+        catch(e) {
+            return false;
+        }
+    }
+
     function handleUserCommand(command, messageStream) {
         // handle command
         var parsed = parseCommand(command);
@@ -960,11 +1004,11 @@ angular.module('tooSmall').factory('tooSmallEngine', ['GameData', function(GameD
             case 0x22:
                 return Unlock(parsed.noun, messageStream);
 
-            //case 0x23:
-                //return this.Save();
+            case 0x23:
+                return Save(messageStream);
 
-            //case 0x24:
-                //return this.Load();
+            case 0x24:
+                return Load(messageStream);
 
             case 0x25:
                 gameData.Quit = true;
