@@ -10,6 +10,9 @@ Karcher Mall, in Nampa, Idaho.  Now, almost 30 years later, this is strangely ap
 to reinvigorate it several times over the years, to no avail.  It's still operating as of this writing, but it is run-down
 and half-empty, and it would make a great location for a supervillain's lair.
 
+[2024 Update] Karcher Mall is no more.  Sort of.  They tore down about half of it (a section in the middle) leaving something
+called The 208, which is about half the size of what it once was, and one of the anchor stores, now standalone.
+
 The antagonist cat in the game was originally named Melbourne, but I later renamed it Janine, after one of my coworkers.  At the
 time, she thought it was funny.
 
